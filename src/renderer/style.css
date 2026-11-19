@@ -218,6 +218,24 @@ button.clean {
 button.clean:hover:not(:disabled) { background: linear-gradient(135deg, #fb8a3c, #f55a72); box-shadow: 0 8px 30px rgba(244, 63, 94, 0.5); }
 .foot-note { text-align: center; color: var(--muted); font-size: 12px; margin-top: 8px; }
 
+/* ---------- star on GitHub ---------- */
+.star-btn { color: #fcd34d; }
+.star-btn:hover:not(:disabled) { color: #fde68a; }
+.star-btn svg { fill: currentColor; fill-opacity: 0.18; }
+.star-card {
+  margin: 0 14px 14px; padding: 14px 16px; border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(250, 204, 21, 0.16), rgba(250, 204, 21, 0.04));
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  animation: pop 0.4s cubic-bezier(.2, 1.4, .4, 1);
+}
+@keyframes pop { from { transform: scale(0.92); opacity: 0; } to { transform: none; opacity: 1; } }
+.star-title { font: 700 15px var(--font-display); }
+.star-text { color: #d6d0b8; font-size: 12px; margin: 4px 0 10px; }
+.star-actions { display: flex; gap: 6px; }
+button.star-yes { background: linear-gradient(135deg, #facc15, #f59e0b); color: #1c1407; border: none; font-weight: 700; }
+button.star-yes:hover:not(:disabled) { background: linear-gradient(135deg, #fde047, #fbbf24); }
+button.star-yes svg { width: 15px; height: 15px; fill: currentColor; }
+
 /* ---------- status, toast, confetti ---------- */
 .status {
   display: flex; justify-content: space-between; gap: 16px;

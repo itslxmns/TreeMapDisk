@@ -702,6 +702,7 @@ async function clean() {
     if (freed > 0) {
       confetti();
       toast(`Freed ${fmt(freed)}! It's in the Recycle Bin if you change your mind.`);
+      askForStar(freed);
     }
     setStatus(failed.length
       ? `Freed ${fmt(freed)}. ${failed.length} item(s) could not be moved: ${failed[0].error}`
@@ -761,6 +762,26 @@ function confetti() {
   };
   requestAnimationFrame(frame);
 }
+
+// ---------- "star on GitHub" ----------
+// Asked once, right after a cleanup that actually freed space. Never again once answered.
+const STAR_KEY = 'starAnswered';
+function askForStar(freed) {
+  if (localStorage.getItem(STAR_KEY)) return;
+  $('starFreed').textContent = fmt(freed);
+  $('starCard').classList.remove('hidden');
+}
+function answerStar(yes) {
+  localStorage.setItem(STAR_KEY, yes ? 'starred' : 'later');
+  $('starCard').classList.add('hidden');
+  if (yes) {
+    window.api.openRepo();
+    toast('Thank you! That really helps.');
+  }
+}
+$('starYes').onclick = () => answerStar(true);
+$('starNo').onclick = () => answerStar(false);
+$('starBtn').onclick = () => window.api.openRepo();
 
 // ---------- screens ----------
 function showScreen(name) {

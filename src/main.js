@@ -140,6 +140,9 @@ ipcMain.handle('pick-folder', async () => {
 
 ipcMain.handle('get-rules', () => publicRules);
 
+const REPO_URL = 'https://github.com/itslxmns/TreeMapDisk';
+ipcMain.handle('open-repo', () => shell.openExternal(REPO_URL));
+
 ipcMain.handle('start-scan', (_e, root) => {
   if (typeof root === 'string' && root) startScan(root);
 });

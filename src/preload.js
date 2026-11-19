@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('api', {
   cancelScan: () => ipcRenderer.invoke('cancel-scan'),
   trash: (items) => ipcRenderer.invoke('trash', items),
   reveal: (p) => ipcRenderer.invoke('reveal', p),
+  openRepo: () => ipcRenderer.invoke('open-repo'),
   onScanStarted: on('scan-started'),
   onProgress: on('scan-progress'),
   onDone: on('scan-done'),
