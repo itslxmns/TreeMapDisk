@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>Disk Treemap</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <div class="brand"><img src="../assets/icon.png" alt=""><span>Disk Treemap</span></div>
+    <button id="homeBtn" class="ghost icon-btn" title="Home">
+      <svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>
+    </button>
+    <button id="up" class="ghost icon-btn" disabled title="Back (Backspace)">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <nav id="crumbs" class="crumbs"></nav>
+    <div class="spacer"></div>
+    <button id="rescan" class="ghost with-icon hidden" title="Scan again">
+      <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg>Rescan
+    </button>
+    <button id="pick" class="primary with-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Scan a folder
+    </button>
+  </header>
+
+  <main>
+    <section class="stage">
+      <!-- Home -->
+      <div id="homeView" class="home">
+        <div class="hero">
+          <h1>What's eating your disk?</h1>
+          <p>Pick a drive or folder. You'll see everything as tiles, and <b>bigger tiles = bigger space hogs</b>.</p>
+        </div>
+        <div id="resume" class="resume hidden"></div>
+        <h3>Drives</h3>
+        <div id="drives" class="cards"></div>
+        <h3>Quick folders</h3>
+        <div id="places" class="cards small"></div>
+      </div>
+
+      <!-- Scanning -->
+      <div id="scanView" class="scanning hidden">
+        <div class="orbit"><div></div><div></div><div></div></div>
+        <div class="scan-count"><span id="scanFiles">0</span> files</div>
+        <div class="scan-bytes" id="scanBytes">0 B so far</div>
+        <div class="quip" id="quip">Weighing every byte…</div>
+        <div class="scan-path" id="scanPath"></div>
+        <button id="cancel" class="ghost">Cancel</button>
+      </div>
+
+      <!-- Results -->
+      <div id="exploreView" class="explore hidden">
+        <div class="story">
+          <div id="headline" class="headline"></div>
+          <div id="compBar" class="comp-bar"></div>
+          <div id="compLegend" class="comp-legend"></div>
+        </div>
+        <div class="map-wrap" id="mapWrap">
+          <canvas id="base"></canvas>
+          <canvas id="overlay"></canvas>
+          <div id="tip" class="tip hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside id="side" class="side hidden">
+      <div class="hero-card">
+        <div class="hero-label">You can free up</div>
+        <div id="freeBig" class="hero-big">0 B</div>
+        <div class="gauge"><div id="gaugeFill"></div></div>
+        <div id="freeSub" class="hero-sub"></div>
+      </div>
+      <h2>Clutter found</h2>
+      <div id="junk" class="junk"></div>
+      <div class="side-foot">
+        <button id="clean" class="clean" disabled>Clean up</button>
+        <div class="foot-note">Goes to the Recycle Bin, so you can always undo.</div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="status"><span id="status">Ready</span><span class="keys">Click = open · Right-click = show in Explorer · Backspace = back</span></footer>
+
+  <canvas id="confetti"></canvas>
+  <div id="toast" class="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
