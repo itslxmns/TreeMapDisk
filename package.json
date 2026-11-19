@@ -1,0 +1,21 @@
+{
+  "name": "disk-treemap",
+  "version": "0.1.0",
+  "description": "See what's eating your disk as a treemap, and clean up node_modules, caches and build output in one click.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "shortcut": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/create-shortcut.ps1"
+  },
+  "keywords": [
+    "electron",
+    "treemap",
+    "disk-usage",
+    "cleanup",
+    "node_modules"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^45.4.1"
+  }
+}
