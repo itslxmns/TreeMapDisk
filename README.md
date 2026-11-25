@@ -13,17 +13,17 @@
 
 > **If Disk Treemap saved you some space, please put a star on this repo** (the Star button at the top right of this page). It's free and helps other people find the app.
 
-Disk Treemap shows any drive or folder as big, friendly tiles: **bigger tile = more space**. It spots stuff that dev tools can rebuild (`node_modules`, Python caches, `.next`, Rust `target/`, .NET `bin/obj`…), marks it with candy stripes, and lets you send it to the **Recycle Bin** with one button.
+Disk Treemap shows any drive or folder as big tiles: **bigger tile = more space**. It spots stuff that dev tools can rebuild (`node_modules`, Python caches, `.next`, Rust `target/`, .NET `bin/obj`…), tapes it off with orange hazard stripes, and lets you send it to the **Recycle Bin** with one button.
 
 ![Results view](docs/screenshot.png)
 
 ## Features
 
-- **One level at a time**: about 36 big tiles max, with the long tail grouped into one "small items" tile. Click a folder and it *flies* open; press `Backspace` (or the mouse back button) to fly back out.
-- **Plain-English summary**: "node_modules takes up 87% of DiscordBot", plus a color bar showing what the folder is made of (video, images, code, clutter…).
-- **Rich tooltips**: hover any tile to see its size, its share of the folder, its file count and what's inside.
-- **Clutter detection that uses context**: `target/` only counts next to a `Cargo.toml`, `bin/obj` only next to a `.csproj`. Clearly safe items are pre-selected, and risky ones (`dist`, `.venv`, `.cache`, `Temp`, `.git`) are pink and opt-in.
-- **Never deletes for real**: everything goes to the Recycle Bin after a confirmation that lists exactly what will be moved. Confetti when it's done.
+- **One level at a time**: about 36 big tiles max, with the long tail grouped into one "small items" tile. Click a folder to zoom in, press `Backspace` (or the mouse back button) to zoom back out.
+- **Summary in plain words**: "node_modules takes up 87% of DiscordBot", plus a color bar showing what the folder is made of (video, images, code, clutter…).
+- **Tooltips**: hover any tile to see its size, its share of the folder, its file count and what's inside.
+- **Clutter detection that uses context**: `target/` only counts next to a `Cargo.toml`, `bin/obj` only next to a `.csproj`. Clearly safe items are pre-selected, and risky ones (`dist`, `.venv`, `.cache`, `Temp`, `.git`) are marked "check first" and opt-in.
+- **Never deletes for real**: everything goes to the Recycle Bin after a confirmation that lists exactly what will be moved.
 - **Home screen**: drive cards with free-space bars, plus one-click quick folders (Downloads, Documents, Desktop…).
 - **Fast**: scanning runs in a worker thread with live progress (about 11,000 files per second on an SSD). Symlinks and junctions are skipped, so nothing is counted twice.
 
@@ -35,8 +35,8 @@ Grab one of these from the [latest release](https://github.com/itslxmns/TreeMapD
 
 | File | What it is |
 |---|---|
-| `DiskTreemap-Setup-1.0.0.exe` | Installer: one click, no admin needed. Adds Desktop and Start menu shortcuts. |
-| `DiskTreemap-1.0.0-portable.exe` | Portable: just double-click it, nothing gets installed. |
+| `DiskTreemap-Setup-1.0.1.exe` | Installer: one click, no admin needed. Adds Desktop and Start menu shortcuts. |
+| `DiskTreemap-1.0.1-portable.exe` | Portable: just double-click it, nothing gets installed. |
 
 > The builds aren't code-signed, so Windows SmartScreen may say "Windows protected your PC". Click **More info → Run anyway**.
 

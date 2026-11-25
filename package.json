@@ -1,7 +1,7 @@
 {
   "name": "disk-treemap",
   "productName": "Disk Treemap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "See what's eating your disk as a treemap, and clean up node_modules, caches and build output in one click.",
   "author": "Disk Treemap contributors",
   "main": "src/main.js",

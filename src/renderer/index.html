@@ -9,16 +9,16 @@
 <body>
   <header class="toolbar">
     <div class="brand"><img src="../assets/icon.png" alt=""><span>Disk Treemap</span></div>
-    <button id="homeBtn" class="ghost icon-btn" title="Home">
+    <button id="homeBtn" class="icon-btn" title="Home">
       <svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>
     </button>
-    <button id="up" class="ghost icon-btn" disabled title="Back (Backspace)">
+    <button id="up" class="icon-btn" disabled title="Back (Backspace)">
       <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
     </button>
     <nav id="crumbs" class="crumbs"></nav>
     <div class="spacer"></div>
-    <button id="starBtn" class="ghost with-icon star-btn" title="Like Disk Treemap? Give it a star on GitHub">
-      <svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Star on GitHub
+    <button id="starBtn" class="ghost with-icon" title="Star Disk Treemap on GitHub">
+      <svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Star
     </button>
     <button id="rescan" class="ghost with-icon hidden" title="Scan again">
       <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg>Rescan
@@ -33,24 +33,24 @@
       <!-- Home -->
       <div id="homeView" class="home">
         <div class="hero">
-          <h1>What's eating your disk?</h1>
-          <p>Pick a drive or folder. You'll see everything as tiles, and <b>bigger tiles = bigger space hogs</b>.</p>
+          <h1>What's eating your disk</h1>
+          <p>Pick a drive or folder to see it as tiles. The bigger the tile, the more space it takes, and striped tiles are clutter you can safely clear.</p>
         </div>
         <div id="resume" class="resume hidden"></div>
         <h3>Drives</h3>
         <div id="drives" class="cards"></div>
-        <h3>Quick folders</h3>
+        <h3>Folders</h3>
         <div id="places" class="cards small"></div>
       </div>
 
       <!-- Scanning -->
       <div id="scanView" class="scanning hidden">
-        <div class="orbit"><div></div><div></div><div></div></div>
+        <div class="spinner"></div>
         <div class="scan-count"><span id="scanFiles">0</span> files</div>
         <div class="scan-bytes" id="scanBytes">0 B so far</div>
         <div class="quip" id="quip">Weighing every byte…</div>
         <div class="scan-path" id="scanPath"></div>
-        <button id="cancel" class="ghost">Cancel</button>
+        <button id="cancel">Cancel</button>
       </div>
 
       <!-- Results -->
@@ -69,17 +69,17 @@
     </section>
 
     <aside id="side" class="side hidden">
-      <div class="hero-card">
-        <div class="hero-label">You can free up</div>
-        <div id="freeBig" class="hero-big">0 B</div>
+      <div class="free-card">
+        <div class="free-label">You can free up</div>
+        <div id="freeBig" class="free-big">0 B</div>
         <div class="gauge"><div id="gaugeFill"></div></div>
-        <div id="freeSub" class="hero-sub"></div>
+        <div id="freeSub" class="free-sub"></div>
       </div>
       <div id="starCard" class="star-card hidden">
-        <div class="star-title">Nice, you just freed <span id="starFreed"></span>!</div>
-        <div class="star-text">If Disk Treemap helped, please put a star on GitHub. It's free and helps other people find the app.</div>
+        <div class="star-title">You freed <span id="starFreed"></span></div>
+        <div class="star-text">If Disk Treemap helped, a star on GitHub helps other people find it</div>
         <div class="star-actions">
-          <button id="starYes" class="star-yes with-icon">
+          <button id="starYes" class="with-icon">
             <svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Star on GitHub
           </button>
           <button id="starNo" class="ghost">Not now</button>
@@ -89,12 +89,15 @@
       <div id="junk" class="junk"></div>
       <div class="side-foot">
         <button id="clean" class="clean" disabled>Clean up</button>
-        <div class="foot-note">Goes to the Recycle Bin, so you can always undo.</div>
+        <div class="foot-note">Moves to the Recycle Bin, so you can undo it</div>
       </div>
     </aside>
   </main>
 
-  <footer class="status"><span id="status">Ready</span><span class="keys">Click = open · Right-click = show in Explorer · Backspace = back</span></footer>
+  <footer class="status">
+    <span id="status">Ready</span>
+    <span class="keys">Click to open · Right-click to show in Explorer · <kbd>Backspace</kbd> to go back</span>
+  </footer>
 
   <canvas id="confetti"></canvas>
   <div id="toast" class="toast"></div>

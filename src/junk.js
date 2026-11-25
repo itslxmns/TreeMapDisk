@@ -14,57 +14,57 @@ const RULES = [
   {
     id: 'node_modules', label: 'node_modules', safe: true,
     names: ['node_modules'],
-    hint: 'Installed npm packages. Restore with npm install.',
+    hint: 'Installed npm packages, restore with npm install',
   },
   {
     id: 'py-cache', label: 'Python caches', safe: true,
     names: ['__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox'],
-    hint: 'Regenerated automatically by Python tools.',
+    hint: 'Python recreates these on the next run',
   },
   {
     id: 'js-cache', label: 'JS framework caches', safe: true,
     names: ['.next', '.nuxt', '.parcel-cache', '.turbo', '.svelte-kit', '.angular', '.vite', '.expo'],
-    hint: 'Rebuilt on the next dev or build run.',
+    hint: 'Rebuilt on the next dev or build run',
   },
   {
     id: 'gradle', label: 'Gradle caches', safe: true,
     names: ['.gradle'],
-    hint: 'Rebuilt by Gradle.',
+    hint: 'Rebuilt by Gradle',
   },
   {
     id: 'rust-target', label: 'Rust build output', safe: true,
     names: ['target'], when: (s) => s.has('cargo.toml'),
-    hint: 'Rebuilt by cargo build.',
+    hint: 'Rebuilt by cargo build',
   },
   {
     id: 'dotnet-build', label: '.NET bin / obj', safe: true,
     names: ['bin', 'obj'], when: (s) => hasExt(s, '.csproj', '.fsproj', '.vbproj'),
-    hint: 'Rebuilt by dotnet build.',
+    hint: 'Rebuilt by dotnet build',
   },
   {
     id: 'js-build', label: 'JS build output', safe: false,
     names: ['dist', 'build', 'out', '.output'], when: (s) => s.has('package.json'),
-    hint: 'Rebuilt by your build script. Check nothing hand-made lives here.',
+    hint: 'Rebuilt by your build script, check nothing hand-made lives here',
   },
   {
     id: 'venv', label: 'Python virtualenvs', safe: false,
     names: ['.venv', 'venv'],
-    hint: 'Recreate with python -m venv and reinstall packages.',
+    hint: 'Recreate with python -m venv and reinstall packages',
   },
   {
     id: 'cache', label: 'Cache folders', safe: false,
     names: ['.cache', 'cache', 'caches'],
-    hint: 'Usually safe, but some apps keep downloads (e.g. AI models) here.',
+    hint: 'Usually safe, but some apps keep downloads like AI models here',
   },
   {
     id: 'temp', label: 'Temp folders', safe: false,
     names: ['temp', 'tmp'],
-    hint: 'Close running apps first; files in use will be skipped.',
+    hint: 'Close running apps first, files in use are skipped',
   },
   {
     id: 'git', label: 'Git history (.git)', safe: false,
     names: ['.git'],
-    hint: 'Deleting this erases the repository history. Only if you really mean it!',
+    hint: 'Erases the repository history, only delete it on purpose',
   },
 ];
 

@@ -12,20 +12,20 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 
 // ---------- categories ----------
 const CATS = [
-  { id: 'junk', label: 'Clutter', c: ['#fdba74', '#ea580c'] },
-  { id: 'video', label: 'Video', c: ['#c4b5fd', '#7c3aed'], ext: 'mp4 mkv mov avi webm wmv flv m4v ts m2ts' },
-  { id: 'images', label: 'Images', c: ['#5eead4', '#0d9488'], ext: 'png jpg jpeg gif webp bmp tga tif tiff psd svg ico exr hdr dds heic raw kra avif' },
-  { id: 'audio', label: 'Audio', c: ['#f9a8d4', '#db2777'], ext: 'mp3 wav flac ogg m4a aac wma opus' },
-  { id: 'archives', label: 'Archives', c: ['#fde68a', '#ca8a04'], ext: 'zip rar 7z tar gz bz2 xz iso cab tgz' },
-  { id: 'models', label: '3D & Games', c: ['#7dd3fc', '#0284c7'], ext: 'blend blend1 fbx obj glb gltf stl rbxl rbxlx rbxm rbxmx max ma mb usd usdz abc unitypackage uasset' },
-  { id: 'code', label: 'Code', c: ['#a5b4fc', '#4f46e5'], ext: 'js mjs cjs ts tsx jsx py cs lua luau c cpp h hpp rs go java json html css xml yml yaml toml sh ps1 map' },
-  { id: 'docs', label: 'Documents', c: ['#86efac', '#16a34a'], ext: 'pdf doc docx txt md xls xlsx ppt pptx csv odt rtf epub' },
-  { id: 'programs', label: 'Programs', c: ['#cbd5e1', '#64748b'], ext: 'exe dll msi sys bin so dylib pak dat db sqlite lib pdb jar wasm node vhdx' },
-  { id: 'other', label: 'Other', c: ['#94a3b8', '#475569'] },
+  { id: 'junk', label: 'Clutter', c: ['#ee6c2b', '#e2611f'] },
+  { id: 'video', label: 'Video', c: ['#8a7fd0', '#7f74c4'], ext: 'mp4 mkv mov avi webm wmv flv m4v ts m2ts' },
+  { id: 'images', label: 'Images', c: ['#4ea398', '#46978c'], ext: 'png jpg jpeg gif webp bmp tga tif tiff psd svg ico exr hdr dds heic raw kra avif' },
+  { id: 'audio', label: 'Audio', c: ['#c2728c', '#b66881'], ext: 'mp3 wav flac ogg m4a aac wma opus' },
+  { id: 'archives', label: 'Archives', c: ['#c49a45', '#b88f3b'], ext: 'zip rar 7z tar gz bz2 xz iso cab tgz' },
+  { id: 'models', label: '3D & Games', c: ['#5a8fc4', '#5084b8'], ext: 'blend blend1 fbx obj glb gltf stl rbxl rbxlx rbxm rbxmx max ma mb usd usdz abc unitypackage uasset' },
+  { id: 'code', label: 'Code', c: ['#7b84c6', '#717aba'], ext: 'js mjs cjs ts tsx jsx py cs lua luau c cpp h hpp rs go java json html css xml yml yaml toml sh ps1 map' },
+  { id: 'docs', label: 'Documents', c: ['#6c9f69', '#62935f'], ext: 'pdf doc docx txt md xls xlsx ppt pptx csv odt rtf epub' },
+  { id: 'programs', label: 'Programs', c: ['#6e727b', '#666a72'], ext: 'exe dll msi sys bin so dylib pak dat db sqlite lib pdb jar wasm node vhdx' },
+  { id: 'other', label: 'Other', c: ['#50535a', '#494c52'] },
 ];
 const JUNK = 0;
 const OTHER = CATS.length - 1;
-const RISKY = ['#fda4af', '#e11d48'];
+const RISKY = ['#4a2c1f', '#432719']; // dark tile, ember stripes: clutter to check first
 const EXT = new Map();
 CATS.forEach((cat, i) => { if (cat.ext) for (const e of cat.ext.split(' ')) EXT.set(e, i); });
 
@@ -43,7 +43,6 @@ const ICONS = {
   locate: 'M12 19a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM12 2v3M12 19v3M2 12h3M19 12h3',
   external: 'M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5',
 };
-const PLACE_TINTS = { home: '#a78bfa', desktop: '#7dd3fc', downloads: '#5eead4', documents: '#86efac', pictures: '#f9a8d4', videos: '#fdba74' };
 function svgIcon(name) {
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
@@ -72,6 +71,7 @@ let busy = false;
 let animating = false;
 
 // ---------- helpers ----------
+const nf = new Intl.NumberFormat('en-US');
 function fmt(b) {
   if (b < 1024) return `${Math.round(b)} B`;
   const units = ['KB', 'MB', 'GB', 'TB'];
@@ -148,17 +148,24 @@ function dominant(n) {
   for (let i = 0; i < k.length; i++) if (k[i] > k[best]) best = i;
   return best;
 }
-// Short uppercase label shown at the top of a tile, e.g. "FOLDER" or "CLUTTER".
+// Short label shown at the top of a tile, like "Folder" or "Clutter"
 function kindOf(n) {
-  if (n.j) return rules[n.j] && rules[n.j].safe ? 'Clutter' : 'Clutter · check first';
+  if (n.j) return rules[n.j] && rules[n.j].safe ? 'Clutter' : 'Clutter, check first';
   if (n.virt || n.other) return 'Grouped';
   if (isFolder(n)) return 'Folder';
   return CATS[leafCat(n)].label;
 }
+// A folder is never painted ember: that color only marks clutter you can delete.
+function folderCat(n) {
+  const k = kOf(n);
+  let best = OTHER;
+  for (let i = 1; i < k.length; i++) if (k[i] > k[best]) best = i;
+  return k[best] > 0 ? best : OTHER;
+}
 function colorsOf(n) {
   if (n.j) return rules[n.j] && rules[n.j].safe ? CATS[JUNK].c : RISKY;
-  if (n.virt || n.other) return ['#64748b', '#334155'];
-  return CATS[isFolder(n) ? dominant(n) : leafCat(n)].c;
+  if (n.virt || n.other) return ['#3a3c41', '#34363b'];
+  return CATS[isFolder(n) ? folderCat(n) : leafCat(n)].c;
 }
 
 // ---------- squarified layout ----------
@@ -211,7 +218,7 @@ function tilesFor(node) {
   }
   if (rest.length === 1) out.push(rest[0]);
   else if (rest.length) {
-    out.push({ n: `${rest.length.toLocaleString()} small items`, s: rest.reduce((a, c) => a + c.s, 0), virt: true, items: rest, p: node });
+    out.push({ n: `${nf.format(rest.length)} small items`, s: rest.reduce((a, c) => a + c.s, 0), virt: true, items: rest, p: node });
   }
   return out.sort((a, b) => b.s - a.s);
 }
@@ -249,91 +256,100 @@ function fitText(ctx, text, maxW) {
   return lo > 0 ? `${text.slice(0, lo)}…` : '';
 }
 
-const GAP = 3;
-const FONT = '"Segoe UI Variable Display", "Segoe UI", sans-serif';
+const GAP = 2; // 4px between tiles
+const FONT = '"Segoe UI Variable Text", "Segoe UI", sans-serif';
+const DISPLAY = '"Segoe UI Variable Display", "Segoe UI", sans-serif';
+
+// Pick dark or light text, whichever reads better on this tile color.
+function luminance(hex) {
+  const v = parseInt(hex.slice(1), 16);
+  const ch = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  return 0.2126 * ch(v >> 16) + 0.7152 * ch((v >> 8) & 255) + 0.0722 * ch(v & 255);
+}
+function inkOn(hex) {
+  const L = luminance(hex);
+  const vsWhite = 1.05 / (L + 0.05);
+  const vsDark = (L + 0.05) / 0.057;
+  return vsDark > vsWhite ? ['#141415', 'rgba(20,20,21,0.72)'] : ['#ffffff', 'rgba(255,255,255,0.76)'];
+}
+
+// Hazard tape: the one signature mark for clutter.
+function hazard(ctx, x, y, w, h, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 7;
+  ctx.beginPath();
+  for (let s = -h; s < w; s += 20) { ctx.moveTo(x + s, y + h); ctx.lineTo(x + s + h, y); }
+  ctx.stroke();
+}
 
 function drawTile(ctx, n, x, y, w, h, parent) {
   x += GAP; y += GAP; w -= GAP * 2; h -= GAP * 2;
   if (w < 1.5 || h < 1.5) return null;
-  const r = Math.max(2, Math.min(12, w / 5, h / 5));
+  const r = Math.max(2, Math.min(8, w / 4, h / 4));
   const [c1, c2] = colorsOf(n);
   const folder = isFolder(n);
+  const risky = n.j && !(rules[n.j] && rules[n.j].safe);
 
   ctx.save();
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, r);
-  const g = ctx.createLinearGradient(x, y, x + w * 0.4, y + h);
-  g.addColorStop(0, folder ? shade(c2, 0.04) : c1);
-  g.addColorStop(1, folder ? shade(c2, -0.2) : c2);
+  const g = ctx.createLinearGradient(x, y, x, y + h); // small tone shift inside one hue
+  g.addColorStop(0, c1);
+  g.addColorStop(1, c2);
   ctx.fillStyle = g;
   ctx.fill();
   ctx.clip();
+  if (n.j) hazard(ctx, x, y, w, h, risky ? 'rgba(238,108,43,0.30)' : 'rgba(26,13,5,0.16)');
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
 
-  // glossy top light
-  const gl = ctx.createLinearGradient(x, y, x, y + Math.min(h, 120));
-  gl.addColorStop(0, 'rgba(255,255,255,0.20)');
-  gl.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = gl;
-  ctx.fillRect(x, y, w, Math.min(h, 120));
-
-  if (n.j) { // candy stripes = "clutter"
-    ctx.strokeStyle = 'rgba(255,255,255,0.13)';
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    for (let s = -h; s < w; s += 18) { ctx.moveTo(x + s, y + h); ctx.lineTo(x + s + h, y); }
-    ctx.stroke();
-  }
-
-  // folder: small composition stripe at the bottom
-  if (folder && w > 90 && h > 90) {
+  // folder: what it's made of, as a thin bar along the bottom
+  if (folder && w > 96 && h > 96) {
     const k = n.k;
-    const bx = x + 12;
-    const bw = w - 24;
-    const by = y + h - 16;
-    ctx.beginPath();
-    ctx.roundRect(bx, by, bw, 6, 3);
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fill();
+    const bx = x + 16;
+    const bw = w - 32;
+    const by = y + h - 20;
     ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, 4, 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fill();
     ctx.clip();
     let cx = bx;
     for (let i = 0; i < k.length; i++) {
       if (!k[i]) continue;
       const sw = (k[i] / n.s) * bw;
-      ctx.fillStyle = CATS[i].c[0];
-      ctx.fillRect(cx, by, sw, 6);
+      ctx.fillStyle = i === JUNK ? '#f6a57a' : shade(CATS[i].c[0], 0.12);
+      ctx.fillRect(cx, by, sw, 4);
       cx += sw;
     }
     ctx.restore();
   }
 
-  // labels
+  // labels: kind, name, size
+  const [ink, ink2] = inkOn(risky ? '#4a2c1f' : c1);
   ctx.textBaseline = 'top';
-  ctx.shadowColor = 'rgba(0,0,0,0.3)';
-  ctx.shadowBlur = 4;
   const share = pct(n.s, parent.s);
-  const pad = Math.min(16, Math.max(7, w / 12));
-  const nameSize = Math.max(13, Math.min(26, Math.sqrt(w * h) / 13));
-  if (w >= 96 && h >= nameSize * 2 + 46) {
-    // kind label, big name, size line
-    ctx.font = `700 10px ${FONT}`;
-    ctx.letterSpacing = '1.2px';
-    ctx.fillStyle = 'rgba(255,255,255,0.68)';
-    ctx.fillText(fitText(ctx, kindOf(n).toUpperCase(), w - pad * 2), x + pad, y + pad);
-    ctx.letterSpacing = '0px';
-    ctx.font = `700 ${nameSize}px ${FONT}`;
-    ctx.fillStyle = '#fff';
-    ctx.fillText(fitText(ctx, n.n, w - pad * 2), x + pad, y + pad + 18);
-    ctx.font = `500 ${Math.max(12, nameSize * 0.62)}px ${FONT}`;
-    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    ctx.fillText(fitText(ctx, `${fmt(n.s)}  ·  ${share}`, w - pad * 2), x + pad, y + pad + 24 + nameSize);
-  } else if (w >= 56 && h >= 38) {
-    ctx.font = `700 12px ${FONT}`;
-    ctx.fillStyle = '#fff';
-    ctx.fillText(fitText(ctx, n.n, w - 12), x + 6, y + 6);
-    ctx.font = `500 11px ${FONT}`;
-    ctx.fillStyle = 'rgba(255,255,255,0.78)';
-    ctx.fillText(fitText(ctx, fmt(n.s), w - 12), x + 6, y + 22);
+  const pad = w > 160 && h > 120 ? 16 : 8;
+  const nameSize = Math.max(14, Math.min(28, Math.round(Math.sqrt(w * h) / 14)));
+  if (w >= 96 && h >= nameSize + 64) {
+    ctx.font = `500 12px ${FONT}`;
+    ctx.fillStyle = ink2;
+    ctx.fillText(fitText(ctx, kindOf(n), w - pad * 2), x + pad, y + pad);
+    ctx.font = `500 ${nameSize}px ${DISPLAY}`;
+    ctx.fillStyle = ink;
+    ctx.fillText(fitText(ctx, n.n, w - pad * 2), x + pad, y + pad + 20);
+    ctx.font = `400 13px ${FONT}`;
+    ctx.fillStyle = ink2;
+    ctx.fillText(fitText(ctx, `${fmt(n.s)} · ${share}`, w - pad * 2), x + pad, y + pad + 28 + nameSize);
+  } else if (w >= 56 && h >= 40) {
+    ctx.font = `500 12px ${FONT}`;
+    ctx.fillStyle = ink;
+    ctx.fillText(fitText(ctx, n.n, w - 16), x + 8, y + 8);
+    ctx.font = `400 12px ${FONT}`;
+    ctx.fillStyle = ink2;
+    ctx.fillText(fitText(ctx, fmt(n.s), w - 16), x + 8, y + 24);
   }
   ctx.restore();
   return { n, x, y, w, h, r };
@@ -342,7 +358,7 @@ function drawTile(ctx, n, x, y, w, h, parent) {
 function paint(ctx, node) {
   ctx.clearRect(0, 0, W, H);
   const tiles = tilesFor(node);
-  const rects = squarify(tiles.map((t) => t.s), 5, 5, W - 10, H - 10);
+  const rects = squarify(tiles.map((t) => t.s), 4, 4, W - 8, H - 8);
   const out = [];
   tiles.forEach((t, i) => {
     const r = rects[i];
@@ -367,12 +383,10 @@ function drawOverlay() {
   octx.save();
   octx.beginPath();
   octx.roundRect(x, y, w, h, r);
-  octx.fillStyle = 'rgba(255,255,255,0.10)';
+  octx.fillStyle = 'rgba(255,255,255,0.06)';
   octx.fill();
-  octx.shadowColor = 'rgba(255,255,255,0.7)';
-  octx.shadowBlur = 16;
-  octx.lineWidth = 2;
-  octx.strokeStyle = '#fff';
+  octx.lineWidth = 1.5;
+  octx.strokeStyle = 'rgba(255,255,255,0.9)';
   octx.stroke();
   octx.restore();
 }
@@ -463,8 +477,8 @@ function renderStory() {
   }
   const junkHere = kOf(view)[JUNK];
   const line2 = el('div', 'line2');
-  if (junkHere > 0) line2.append(bold(fmt(junkHere)), ' in here is clutter that tools can rebuild. Look for the striped tiles.');
-  else line2.append('No clutter here. Everything in this folder is real stuff.');
+  if (junkHere > 0) line2.append(bold(fmt(junkHere)), ' of this is clutter that tools can rebuild, marked with stripes');
+  else line2.append('No clutter here, everything in this folder is your own stuff');
   box.append(line1, line2);
 
   const k = kOf(view);
@@ -476,7 +490,8 @@ function renderStory() {
   for (const i of order) {
     const seg = el('div');
     seg.style.width = `${(k[i] / view.s) * 100}%`;
-    seg.style.background = `linear-gradient(180deg, ${CATS[i].c[0]}, ${CATS[i].c[1]})`;
+    seg.style.background = CATS[i].c[0];
+    if (i === JUNK) seg.className = 'striped';
     seg.title = `${CATS[i].label}: ${fmt(k[i])} (${pct(k[i], view.s)})`;
     bar.append(seg);
   }
@@ -484,6 +499,7 @@ function renderStory() {
     const chip = el('span');
     const dot = el('i');
     dot.style.background = CATS[i].c[0];
+    if (i === JUNK) dot.className = 'striped';
     chip.append(dot, `${CATS[i].label} `, el('em', null, fmt(k[i])));
     legend.append(chip);
   }
@@ -519,6 +535,7 @@ function showTip(h, mx, my) {
   const title = el('div', 't-title');
   const dot = el('i');
   dot.style.background = colorsOf(n)[0];
+  if (n.j) dot.className = 'striped';
   title.append(dot, el('span', null, n.n));
   let kind;
   let hint;
@@ -536,7 +553,7 @@ function showTip(h, mx, my) {
     hint = '';
   } else if (isFolder(n)) {
     const d = CATS[dominant(n)];
-    kind = `Folder · ${(n.f || 0).toLocaleString()} files · mostly ${d.label.toLowerCase()}`;
+    kind = `Folder · ${nf.format(n.f || 0)} files · mostly ${d.label.toLowerCase()}`;
     hint = 'Click to look inside';
   } else {
     kind = `${CATS[leafCat(n)].label} file`;
@@ -580,7 +597,7 @@ function updateSelection() {
   animateNumber(total);
   $('gaugeFill').style.width = scan && scan.tree.s ? `${Math.min(100, (total / scan.tree.s) * 100)}%` : '0';
   $('freeSub').textContent = scan
-    ? `${list.length} of ${collectJunk().length} items selected · that's ${pct(total, scan.tree.s)} of ${nameOf(scan.tree)}${found > total ? ` · ${fmt(found)} found in total` : ''}`
+    ? `${list.length} of ${collectJunk().length} selected · ${pct(total, scan.tree.s)} of ${nameOf(scan.tree)}${found > total ? ` · ${fmt(found)} found` : ''}`
     : '';
   $('clean').textContent = list.length ? `Clean up ${fmt(total)}` : 'Clean up';
   $('clean').disabled = !list.length || busy;
@@ -592,7 +609,7 @@ function renderJunk() {
   if (!scan) return;
   const items = collectJunk();
   if (!items.length) {
-    box.append(el('div', 'empty-note', 'Spotless! No regenerable clutter in this folder.'));
+    box.append(el('div', 'empty-note', 'No rebuildable clutter in this folder'));
     updateSelection();
     return;
   }
@@ -620,7 +637,6 @@ function renderJunk() {
       renderJunk();
     };
     const swatch = el('span', 'gi');
-    swatch.style.background = rule.safe ? CATS[JUNK].c[1] : RISKY[1];
     head.append(all, swatch, el('span', 'name', rule.label),
       el('span', 'count', `×${g.list.length}`), el('span', 'size', fmt(g.total)));
     head.onclick = () => {
@@ -701,7 +717,7 @@ async function clean() {
     renderJunk();
     if (freed > 0) {
       confetti();
-      toast(`Freed ${fmt(freed)}! It's in the Recycle Bin if you change your mind.`);
+      toast(`Moved ${fmt(freed)} to the Recycle Bin`);
       askForStar(freed);
     }
     setStatus(failed.length
@@ -733,8 +749,8 @@ function confetti() {
   c.width = innerWidth * r;
   c.height = innerHeight * r;
   ctx.setTransform(r, 0, 0, r, 0, 0);
-  const colors = ['#f97316', '#f43f5e', '#8b5cf6', '#14b8a6', '#facc15', '#38bdf8', '#ffffff'];
-  const parts = Array.from({ length: 180 }, () => ({
+  const colors = ['#ee6c2b', '#f6a57a', '#ededed', '#a1a1a6', '#4ea398', '#c49a45'];
+  const parts = Array.from({ length: 120 }, () => ({
     x: innerWidth - 200 + (Math.random() - 0.5) * 160,
     y: innerHeight - 80,
     vx: (Math.random() - 0.75) * 14,
@@ -751,14 +767,14 @@ function confetti() {
     for (const p of parts) {
       p.vy += 0.42; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
       ctx.save();
-      ctx.globalAlpha = Math.max(0, 1 - age / 2600);
+      ctx.globalAlpha = Math.max(0, 1 - age / 1800);
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
       ctx.fillStyle = p.color;
       ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
       ctx.restore();
     }
-    if (age < 2600) requestAnimationFrame(frame); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+    if (age < 1800) requestAnimationFrame(frame); else ctx.clearRect(0, 0, innerWidth, innerHeight);
   };
   requestAnimationFrame(frame);
 }
@@ -776,7 +792,7 @@ function answerStar(yes) {
   $('starCard').classList.add('hidden');
   if (yes) {
     window.api.openRepo();
-    toast('Thank you! That really helps.');
+    toast('Thanks, that helps a lot');
   }
 }
 $('starYes').onclick = () => answerStar(true);
@@ -796,10 +812,9 @@ function showScreen(name) {
   if (name === 'explore') requestAnimationFrame(render);
 }
 
-function card(icon, tint, title, sub, onClick, barPct) {
+function card(icon, title, sub, onClick, barPct) {
   const b = el('button', 'card');
   const ico = el('span', 'ico');
-  ico.style.setProperty('--tint', tint);
   ico.append(svgIcon(icon));
   b.append(ico, el('span', 'title', title));
   if (barPct != null) {
@@ -819,7 +834,7 @@ function renderResume() {
   box.textContent = '';
   box.classList.toggle('hidden', !scan);
   if (!scan) return;
-  const b = el('button', null, `Back to results for ${scan.root} (${fmt(scan.tree.s)})`);
+  const b = el('button', null, `Back to ${scan.root} · ${fmt(scan.tree.s)}`);
   b.onclick = () => showScreen('explore');
   box.append(b);
 }
@@ -830,17 +845,17 @@ async function renderHome() {
   dBox.textContent = '';
   for (const d of drives) {
     const used = d.total ? (d.total - d.free) / d.total : null;
-    const sub = d.total ? `${fmt(d.free)} free of ${fmt(d.total)}` : 'Click to scan';
-    dBox.append(card('drive', '#a78bfa', d.path.replace(/\\$/, ''), sub, () => startScan(d.path), used));
+    const sub = d.total ? `${fmt(d.free)} free of ${fmt(d.total)}` : 'Size unknown';
+    dBox.append(card('drive', d.path.replace(/\\$/, ''), sub, () => startScan(d.path), used));
   }
   const places = await window.api.listPlaces();
   const pBox = $('places');
   pBox.textContent = '';
   for (const p of places) {
     const label = p.id[0].toUpperCase() + p.id.slice(1);
-    pBox.append(card(p.id, PLACE_TINTS[p.id] || '#a78bfa', label, p.path, () => startScan(p.path)));
+    pBox.append(card(p.id, label, p.path, () => startScan(p.path)));
   }
-  pBox.append(card('plus', '#cbd5e1', 'Any folder…', 'Pick one yourself', pickAndScan));
+  pBox.append(card('plus', 'Other folder', 'Choose any folder to scan', pickAndScan));
 }
 
 // ---------- scanning ----------
@@ -862,8 +877,8 @@ window.api.onScanStarted(({ root }) => {
 });
 
 window.api.onProgress((d) => {
-  $('scanFiles').textContent = d.files.toLocaleString();
-  $('scanBytes').textContent = `${fmt(d.bytes)} so far · ${d.dirs.toLocaleString()} folders`;
+  $('scanFiles').textContent = nf.format(d.files);
+  $('scanBytes').textContent = `${fmt(d.bytes)} so far · ${nf.format(d.dirs)} folders`;
   $('scanPath').textContent = d.current;
 });
 
@@ -879,8 +894,8 @@ window.api.onDone((d) => {
   showScreen('explore');
   setView(scan.tree);
   renderJunk();
-  const skipped = d.stats.errors ? ` · ${d.stats.errors.toLocaleString()} items skipped (no permission)` : '';
-  setStatus(`Scanned ${d.stats.files.toLocaleString()} files (${fmt(d.tree.s)}) in ${(d.stats.ms / 1000).toFixed(1)} s${skipped}`);
+  const skipped = d.stats.errors ? ` · ${nf.format(d.stats.errors)} items skipped (no permission)` : '';
+  setStatus(`Scanned ${nf.format(d.stats.files)} files (${fmt(d.tree.s)}) in ${(d.stats.ms / 1000).toFixed(1)} s${skipped}`);
 });
 
 window.api.onError((msg) => {
