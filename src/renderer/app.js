@@ -799,6 +799,24 @@ $('starYes').onclick = () => answerStar(true);
 $('starNo').onclick = () => answerStar(false);
 $('starBtn').onclick = () => window.api.openRepo();
 
+// ---------- updates ----------
+window.api.onUpdate(({ state, version }) => {
+  const box = $('update');
+  const btn = $('updateBtn');
+  if (state === 'ready') {
+    $('updateText').textContent = `Version ${version} is ready`;
+    btn.textContent = 'Restart to update';
+    btn.onclick = () => window.api.installUpdate();
+  } else if (state === 'portable') {
+    $('updateText').textContent = `Version ${version} is out`;
+    btn.textContent = 'Download';
+    btn.onclick = () => window.api.openReleases();
+  } else {
+    return;
+  }
+  box.classList.remove('hidden');
+});
+
 // ---------- screens ----------
 function showScreen(name) {
   $('homeView').classList.toggle('hidden', name !== 'home');

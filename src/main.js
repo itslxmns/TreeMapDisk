@@ -5,6 +5,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const { Worker } = require('node:worker_threads');
 const { publicRules } = require('./junk');
+const { setupUpdates } = require('./updates');
 
 // Dev helpers: `electron . --scan=D:\some\folder --screenshot=shot.png`
 // scans on launch, saves a screenshot when done, then quits (used for the README image).
@@ -37,10 +38,16 @@ function createWindow() {
   win.removeMenu();
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
   if (autoScan) win.webContents.once('did-finish-load', () => startScan(path.resolve(autoScan)));
-  else if (screenshotPath) win.webContents.once('did-finish-load', () => setTimeout(saveScreenshot, 1500));
+  else if (screenshotPath) {
+    const wait = !app.isPackaged && Number(arg('wait')) > 0 ? Number(arg('wait')) : 1500; // dev: --wait=ms
+    win.webContents.once('did-finish-load', () => setTimeout(saveScreenshot, wait));
+  }
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  setupUpdates(send);
+});
 app.on('window-all-closed', () => app.quit());
 
 function send(channel, data) {

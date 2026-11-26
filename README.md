@@ -35,8 +35,12 @@ Grab one of these from the [latest release](https://github.com/itslxmns/TreeMapD
 
 | File | What it is |
 |---|---|
-| `DiskTreemap-Setup-1.0.1.exe` | Installer: one click, no admin needed. Adds Desktop and Start menu shortcuts. |
-| `DiskTreemap-1.0.1-portable.exe` | Portable: just double-click it, nothing gets installed. |
+| `DiskTreemap-Setup-1.0.2.exe` | Installer: one click, no admin needed. Adds Desktop and Start menu shortcuts, and **updates itself**. |
+| `DiskTreemap-1.0.2-portable.exe` | Portable: just double-click it, nothing gets installed. Tells you when a new version is out. |
+
+### Updates
+
+The installed app checks GitHub Releases when it starts. If there's a new version, it downloads it in the background and installs it the next time you close the app, or right away with **Restart to update** in the status bar. Versions before 1.0.2 don't have this yet, so install 1.0.2 once by hand.
 
 > The builds aren't code-signed, so Windows SmartScreen may say "Windows protected your PC". Click **More info → Run anyway**.
 
@@ -44,17 +48,17 @@ Grab one of these from the [latest release](https://github.com/itslxmns/TreeMapD
 
 | Group | Folders | Pre-selected |
 |---|---|---|
-| node_modules | `node_modules` | |
-| Python caches | `__pycache__`, `.pytest_cache`, `.mypy_cache`, `.ruff_cache`, `.tox` | |
-| JS framework caches | `.next`, `.nuxt`, `.parcel-cache`, `.turbo`, `.svelte-kit`, `.angular`, `.vite`, `.expo` | |
-| Gradle caches | `.gradle` | |
-| Rust build output | `target` (next to `Cargo.toml`) | |
-| .NET bin / obj | `bin`, `obj` (next to a `.csproj`/`.fsproj`/`.vbproj`) | |
-| JS build output | `dist`, `build`, `out`, `.output` (next to `package.json`) | — |
-| Python virtualenvs | `.venv`, `venv` | — |
-| Cache folders | `.cache`, `cache`, `caches` | — |
-| Temp folders | `temp`, `tmp` | — |
-| Git history | `.git` | — |
+| node_modules | `node_modules` | Yes |
+| Python caches | `__pycache__`, `.pytest_cache`, `.mypy_cache`, `.ruff_cache`, `.tox` | Yes |
+| JS framework caches | `.next`, `.nuxt`, `.parcel-cache`, `.turbo`, `.svelte-kit`, `.angular`, `.vite`, `.expo` | Yes |
+| Gradle caches | `.gradle` | Yes |
+| Rust build output | `target` (next to `Cargo.toml`) | Yes |
+| .NET bin / obj | `bin`, `obj` (next to a `.csproj`/`.fsproj`/`.vbproj`) | Yes |
+| JS build output | `dist`, `build`, `out`, `.output` (next to `package.json`) | No |
+| Python virtualenvs | `.venv`, `venv` | No |
+| Cache folders | `.cache`, `cache`, `caches` | No |
+| Temp folders | `temp`, `tmp` | No |
+| Git history | `.git` | No |
 
 The rules live in [`src/junk.js`](src/junk.js). Adding one takes a single object.
 
@@ -71,6 +75,16 @@ npm run dist       # build the installer + portable .exe into release/
 npm run icon       # regenerate src/assets/icon.png
 ```
 
+### Publishing a release
+
+1. Bump `"version"` in `package.json`, then run `npm run dist`.
+2. Push, then create a GitHub release with the tag `v<version>`.
+3. Attach **all four** files from `release/`:
+   - `DiskTreemap-Setup-<version>.exe`
+   - `DiskTreemap-Setup-<version>.exe.blockmap`
+   - `latest.yml` (the updater reads this; without it nobody gets the update)
+   - `DiskTreemap-<version>-portable.exe`
+
 Dev helper: scan on launch, save a screenshot, and quit:
 
 ```bash
@@ -85,6 +99,7 @@ src/
 ├── preload.js     Exposes a small API to the page (contextIsolation + sandbox)
 ├── scanner.js     Worker thread: walks the disk and builds a compact size tree
 ├── junk.js        Rules for regenerable folders
+├── updates.js     Auto-update from GitHub Releases (electron-updater)
 ├── assets/        App icon (drawn by scripts/make-icon.js)
 └── renderer/      UI: canvas treemap, zoom animation, story header, cleanup sidebar
 ```

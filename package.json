@@ -1,14 +1,14 @@
 {
   "name": "disk-treemap",
   "productName": "Disk Treemap",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "See what's eating your disk as a treemap, and clean up node_modules, caches and build output in one click.",
   "author": "Disk Treemap contributors",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "icon": "electron scripts/make-icon.js",
-    "dist": "electron-builder --win"
+    "dist": "electron-builder --win --publish never"
   },
   "keywords": [
     "electron",
@@ -49,6 +49,17 @@
     },
     "portable": {
       "artifactName": "DiskTreemap-${version}-portable.${ext}"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "itslxmns",
+        "repo": "TreeMapDisk",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
   }
 }
